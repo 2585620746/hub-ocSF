@@ -1,0 +1,154 @@
+{
+  "stock": {
+    "n": 50,
+    "stats": {
+      "raw": {
+        "is_json": 50,
+        "has_required": 50,
+        "schema_valid": 45,
+        "total_latency": 24.990005493164062
+      },
+      "response_format": {
+        "is_json": 50,
+        "has_required": 50,
+        "schema_valid": 45,
+        "total_latency": 21.438673973083496
+      },
+      "guided_json": {
+        "is_json": 50,
+        "has_required": 50,
+        "schema_valid": 45,
+        "total_latency": 21.385361909866333
+      }
+    },
+    "fails": {
+      "raw": [
+        {
+          "user": "600028 中石化最低价",
+          "output": "{\"symbol\": \"600028\", \"market\": \"SH\", \"date\": null, \"fields\": [\"low\"], \"adjust\": \"qfq\"}",
+          "error": "schema: None is not of type 'string'"
+        },
+        {
+          "user": "五粮液现在什么价",
+          "output": "{\"symbol\": \"800301.SZ\", \"market\": \"SZ\", \"date\": \"2026-05-12\", \"fields\": [\"close\"], \"adjust\": \"hfq\"}",
+          "error": "schema: '800301.SZ' does not match '^\\\\d{6}$'"
+        },
+        {
+          "user": "请查询东方财富成交量并分析异动原因",
+          "output": "{\"symbol\": \"000001.SZ\", \"market\": \"SZ\", \"date\": \"2023-08-15\", \"fields\": [\"volume\"], \"adjust\": \"hfq\"}",
+          "error": "schema: '000001.SZ' does not match '^\\\\d{6}$'"
+        }
+      ],
+      "response_format": [
+        {
+          "user": "600028 中石化最低价",
+          "output": "{\"symbol\": \"600028\", \"market\": \"SH\", \"date\": null, \"fields\": [\"low\"], \"adjust\": \"qfq\"}",
+          "error": "schema: None is not of type 'string'"
+        },
+        {
+          "user": "五粮液现在什么价",
+          "output": "{\"symbol\": \"800301.SZ\", \"market\": \"SZ\", \"date\": \"2026-05-12\", \"fields\": [\"close\"], \"adjust\": \"hfq\"}",
+          "error": "schema: '800301.SZ' does not match '^\\\\d{6}$'"
+        },
+        {
+          "user": "请查询东方财富成交量并分析异动原因",
+          "output": "{\"symbol\": \"000001.SZ\", \"market\": \"SZ\", \"date\": \"2023-07-15\", \"fields\": [\"volume\"], \"adjust\": \"hfq\"}",
+          "error": "schema: '000001.SZ' does not match '^\\\\d{6}$'"
+        }
+      ],
+      "guided_json": [
+        {
+          "user": "600028 中石化最低价",
+          "output": "{\"symbol\": \"600028\", \"market\": \"SH\", \"date\": null, \"fields\": [\"low\"], \"adjust\": \"qfq\"}",
+          "error": "schema: None is not of type 'string'"
+        },
+        {
+          "user": "五粮液现在什么价",
+          "output": "{\"symbol\": \"800301.SZ\", \"market\": \"SZ\", \"date\": \"2026-05-12\", \"fields\": [\"close\"], \"adjust\": \"hfq\"}",
+          "error": "schema: '800301.SZ' does not match '^\\\\d{6}$'"
+        },
+        {
+          "user": "请查询东方财富成交量并分析异动原因",
+          "output": "{\"symbol\": \"000001.SZ\", \"market\": \"SZ\", \"date\": \"2023-07-15\", \"fields\": [\"volume\"], \"adjust\": \"hfq\"}",
+          "error": "schema: '000001.SZ' does not match '^\\\\d{6}$'"
+        }
+      ]
+    }
+  },
+  "order": {
+    "n": 50,
+    "stats": {
+      "raw": {
+        "is_json": 50,
+        "has_required": 50,
+        "schema_valid": 29,
+        "total_latency": 21.254047393798828
+      },
+      "response_format": {
+        "is_json": 50,
+        "has_required": 50,
+        "schema_valid": 29,
+        "total_latency": 20.631796836853027
+      },
+      "guided_json": {
+        "is_json": 50,
+        "has_required": 50,
+        "schema_valid": 29,
+        "total_latency": 20.28727626800537
+      }
+    },
+    "fails": {
+      "raw": [
+        {
+          "user": "赵六要 10 个保温杯，电话 13644445555，普通即可",
+          "output": "{\"product\": \"保温杯\", \"quantity\": 10, \"user_phone\": \"13644445555\", \"delivery_date\": null, \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: None is not of type 'string'"
+        },
+        {
+          "user": "给我 200 个鼠标，电话 13912345678",
+          "output": "{\"product\": \"鼠标\", \"quantity\": 200, \"user_phone\": \"13912345678\", \"delivery_date\": \"2026-05-14\", \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: 200 is greater than the maximum of 100"
+        },
+        {
+          "user": "订 0 个苹果，13812345678",
+          "output": "{\"product\": \"苹果\", \"quantity\": 0, \"user_phone\": \"13812345678\", \"delivery_date\": \"2023-09-13\", \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: 0 is less than the minimum of 1"
+        }
+      ],
+      "response_format": [
+        {
+          "user": "赵六要 10 个保温杯，电话 13644445555，普通即可",
+          "output": "{\"product\": \"保温杯\", \"quantity\": 10, \"user_phone\": \"13644445555\", \"delivery_date\": null, \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: None is not of type 'string'"
+        },
+        {
+          "user": "给我 200 个鼠标，电话 13912345678",
+          "output": "{\"product\": \"鼠标\", \"quantity\": 200, \"user_phone\": \"13912345678\", \"delivery_date\": \"2026-05-14\", \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: 200 is greater than the maximum of 100"
+        },
+        {
+          "user": "订 0 个苹果，13812345678",
+          "output": "{\"product\": \"苹果\", \"quantity\": 0, \"user_phone\": \"13812345678\", \"delivery_date\": \"2023-09-13\", \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: 0 is less than the minimum of 1"
+        }
+      ],
+      "guided_json": [
+        {
+          "user": "赵六要 10 个保温杯，电话 13644445555，普通即可",
+          "output": "{\"product\": \"保温杯\", \"quantity\": 10, \"user_phone\": \"13644445555\", \"delivery_date\": null, \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: None is not of type 'string'"
+        },
+        {
+          "user": "给我 200 个鼠标，电话 13912345678",
+          "output": "{\"product\": \"鼠标\", \"quantity\": 200, \"user_phone\": \"13912345678\", \"delivery_date\": \"2026-05-14\", \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: 200 is greater than the maximum of 100"
+        },
+        {
+          "user": "订 0 个苹果，13812345678",
+          "output": "{\"product\": \"苹果\", \"quantity\": 0, \"user_phone\": \"13812345678\", \"delivery_date\": \"2023-09-13\", \"priority\": \"normal\", \"payment_method\": \"alipay\"}",
+          "error": "schema: 0 is less than the minimum of 1"
+        }
+      ]
+    }
+  }
+}
