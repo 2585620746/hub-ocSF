@@ -1,27 +1,3 @@
-"""
-吞吐对比：transformers 串行 / transformers batch=8 / Ollama 批处理
-
-教学重点：
-  1. 为什么 transformers 原生 generate 生产环境不够用（串行慢，batch 有限）
-  2. 为什么 Ollama 快：基于 llama.cpp，内置 continuous batching
-     - KV cache 优化，消除内存碎片
-     - continuous batching: 不同长度请求动态组 batch，不等最长的
-  3. 同一个模型、同一批请求，Ollama 比原生 transformers 快 5-10 倍
-
-测试方法：
-  50 个长短混合的问答 prompt（从短到长），目标生成 100 token
-  三路分别测总耗时、QPS（请求/秒）、token/s（生成速度）
-  产出柱状图到 outputs/throughput_comparison.png
-
-使用方式：
-  # 确保 Ollama 服务已启动（ollama serve）
-  # 运行本脚本
-  python bench_throughput.py
-
-环境：
-  8GB 显存：串行/batch 跑 transformers 需 ~2GB；Ollama 跑时用 ~5GB
-"""
-
 import gc
 import json
 import os
