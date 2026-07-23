@@ -10,7 +10,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware  # [修改] 添加 CORS 支持
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
