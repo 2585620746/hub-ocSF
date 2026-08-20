@@ -1,0 +1,69 @@
+一、各模型结构特点详解
+1.1 DeepSeek V4 Pro (0813)
+架构：Mixture-of-Experts（MoE），总参数 1.6T、每 Token 激活 49B。
+层结构：61 层 Transformer，hidden size 7,168。
+MoE 配置：每层 1 个共享专家 + 384 个路由专家，每 Token 激活 6 个路由专家；前 3 层采用 hash-routed 初始化 MoE。
+注意力：混合注意力 = Compressed Sparse Attention (CSA) + Heavily Compressed Attention (HCA)，配合 128 个 token 的本地不压缩分支。CSA 以 4 tokens/entry 压缩、每查询保留 Top-1,024；HCA 以 128 tokens/entry 重度压缩。在 1M 上下文下，单 Token 推理 FLOPs 仅为 V3.2 的 27%，KV Cache 为 10%。
+残差连接：Manifold-Constrained Hyper-Connections (mHC)，残差流扩展 4×，增强深层信号传播稳定性。
+训练：32T+ tokens 预训练；Muon 优化器；FP4（专家）+ FP8（其余）混合精度。后训练采用两阶段：先对各领域专家独立做 SFT+GRPO 强化，再通过 on-policy distillation 整合进统一模型。
+推理模式：Non-think / Think High / Think Max 三档，Think Max 建议至少 384K 上下文。
+0813 版本：以原生 Responses API 与 Agent/工具调用优化为主（GA 发布）。
+开源：MIT 许可，权重与 technical report 均公开。
+1.2 dots3-note Preview（小红书）
+架构：多模态 MoE，总参数 280B、激活 16B，是 dots3 系列最轻量级成员。
+层结构：1 个稠密层 + 45 个 MoE 层，hidden size 5,120；FFN：稠密层 13,824、单专家 1,536。
+MoE 配置：256 个路由专家 + 1 个共享专家，Top-8 激活。
+注意力：13 层 DSA（DeepSeek Sparse Attention，Top-2,048）+ 33 层 SWA（滑动窗口注意力），比例约 1:3，支撑 512K 上下文。
+MTP：1 个共享层、1.13B，用于多 Token 预测加速解码。
+多模态编码器：视觉为 MoE ViT（7B 总 / 1.2B 激活），音频为稠密 800M；支持文本、图像、视频、音频输入。
+训练方法：TEMPO（Test-time-scaled Value Estimation with Macro-step Policy Optimization）——将超长轨迹切分为 macro-step，actor/critic 切换并利用 test-time scaling 估计价值，解决长程 RL 稀疏奖励问题；配合 Self-Critiquing 机制与主动记忆（如 memory.md）。
+定位：长程 Agent、探索-记忆-纠错、多模态理解；同系列在 IMO 2026 获官方满分 42 分。
+开源：Apache 2.0，权重、GitHub 仓库（studio-dots-ai/dots3-note-prev）与评测基准（VibeSearchBench/VibeLifeBench）公开。
+1.3 Qwen3.8-Max (2.4T-A95B)
+架构：基于 Qwen3.5 架构的稀疏 MoE，总参数 2.4T、激活 95B。
+层结构：92 层，hidden size 8,192，词表 248,320。
+隐藏布局：23 × (3 × (Gated DeltaNet → MoE) → 1 × (Gated Attention → MoE))——每 4 层为一个超块，3 层线性注意力（Gated DeltaNet）+ 1 层门控注意力混合排列。
+混合注意力：Gated DeltaNet（线性注意力，V 头 128 / QK 头 16，head dim 128）+ Gated Attention（Q 头 64 / KV 头 4，head dim 256，RoPE 维度 64）。线性注意力显著降低长上下文 KV 开销。
+MoE 配置：512 个专家，每 Token 激活 10 个路由专家 + 1 个共享专家，专家中间维度 2,048。
+MTP：多步 Multi-Token Prediction。
+多模态：统一视觉-语言基础，早期融合训练于万亿级多模态 tokens，原生视觉理解。
+上下文：原生 262,144，可扩展至 1,010,000 tokens；支持 201 种语言。
+训练：规模化 RL 泛化（百万级 agent 环境）、异步 RL 框架；BF16 权重。
+开源：Max 级权重首次开源（Qwen/Qwen3.8-2.4T-A95B），部署支持 vLLM/SGLang/TokenSpeed。
+1.4 Qwen3.8-27B
+架构：稠密（Dense）Transformer，总参数 27B，无稀疏激活——与 Qwen3.8-Max 的 MoE 路线形成对比。
+定位：小参数高性能的多模态模型，作为 Max 的下沉配套版本开源。
+上下文：约 262K tokens。
+能力：覆盖多模态理解与推理，社区量化版本密集（GGUF/AWQ 等），适合本地部署。
+开源：与 Qwen3.8-Max 同批公布开源计划（2026-08-14 上线）。
+1.5 GLM-5.3（智谱 Z.ai）
+架构：MoE，总参数 743B，激活约 40B；基础模型与 GLM-5.2 完全一致（未重做预训练）。
+MoE 配置：256 个专家、Top-8 激活（继承 GLM-5 系列），稀疏度约 5.9%。
+注意力：MLA（Multi-head Latent Attention）+ DSA（DeepSeek Sparse Attention），近似线性复杂度长上下文，1M 上下文。
+后训练（核心差异）：全部能力提升来自后训练扩展——“Scaling post-training is all we did”。三大支柱：
+IndexShare：长上下文处理效率优化，支持 1000+ 连续训练步（6× 提升）。
+SAO（Sequential Action Optimization）：单轨迹级异步训练，解耦训练与推理，稳定支撑 1000+ 步长轨迹。
+Slime：开源异步 RL 分布式后训练框架（THUDM/slime），Megatron+GLM 统一数据流。
+能力：自评编码能力较 GLM-5.2 提升约 50%；公开 Terminal-Bench 3.0 开源模型第一；网络安全能力涌现——发现 2,436 个真实漏洞（最早追溯到 1981 年）。
+发布形态：发布时以 API/编码订阅（GLM Coding Plan、ZCode）为主，权重计划约两周后（8 月底）随安全审查后开放。
+二、注意力机制对比
+模型	注意力方案	长上下文策略
+DeepSeek V4 Pro	CSA（压缩稀疏）+ HCA（重度压缩）+ 本地128 token分支	1M 上下文下 FLOPs 降至 V3.2 的 27%、KV 降至 10%
+dots3-note	13×DSA（Top-2048）+ 33×SWA（滑动窗口），约1:3	512K 上下文，线性稀疏注意力
+Qwen3.8-Max	Gated DeltaNet（线性）+ Gated Attention（RoPE）3:1 混合	原生 262K，可扩至 1M，线性注意力控 KV
+Qwen3.8-27B	稠密全注意力	约 262K
+GLM-5.3	MLA + DSA（稀疏注意力）	1M 上下文，近似线性复杂度
+三、训练方法论对比
+模型	预训练规模	后训练关键方法
+DeepSeek V4 Pro	32T+ tokens	领域专家独立 SFT+GRPO 强化 → on-policy 蒸馏整合；Muon 优化器；FP4/FP8 混合
+dots3-note	未完全披露	TEMPO（macro-step 价值估计+test-time scaling）+ Self-Critiquing + 主动记忆
+Qwen3.8-Max	万亿级多模态 tokens	早期融合多模态预训练；百万 agent 环境规模化 RL
+Qwen3.8-27B	未披露	与 Max 同源后训练管线
+GLM-5.3	基础沿用 GLM-5（28.5T）	纯后训练扩展：IndexShare + SAO + Slime 异步 RL
+四、定位与适用场景对比
+模型	核心定位	最适场景
+DeepSeek V4 Pro 0813	旗舰推理+Agent 编码，超长输出（384K）	复杂代码工程、Agent 工作流、长文档处理、本地部署（MIT）
+dots3-note Preview	长程多模态 Agent、探索学习	开放长程任务、视觉/语音+推理、环境交互记忆类 Agent
+Qwen3.8-Max	旗舰级编码+长程自主交付	企业长程 Agent、1M 上下文、原生视觉、私有化部署
+Qwen3.8-27B	小参数高效多模态	本地/边缘部署、低成本推理、多模态轻量应用
+GLM-5.3	后训练驱动的编码+安全特化	编码助手、终端 Agent、网络安全（红队/漏洞分析）
